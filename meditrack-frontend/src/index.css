@@ -2,7 +2,6 @@
 @tailwind base;
 /* tailwind component classes */
 @tailwind components;
-/* tailwind utility classes */
 @tailwind utilities;
 
 body {
