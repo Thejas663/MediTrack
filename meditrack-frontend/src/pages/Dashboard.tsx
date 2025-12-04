@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { reminderAPI } from '../utils/api';
+import { reminderAPI, takenLogAPI } from '../utils/api';
+import StatsCard from '../components/StatsCard';
+import QuickActions from '../components/QuickActions';
 
 interface Reminder {
   _id: string;
@@ -54,9 +56,30 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleMarkAsTaken = async (reminderId: string, medicineName: string) => {
+    try {
+      await takenLogAPI.markAsTaken({ reminderId, status: 'taken' });
+      alert(`✅ ${medicineName} marked as taken!`);
+    } catch (error) {
+      console.error('Error marking as taken:', error);
+      alert('Failed to mark as taken');
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
+
+  // Calculate simple stats
+  const totalReminders = reminders.length;
+  const activeReminders = reminders.filter(r => r.isActive).length;
+  const lowStockCount = reminders.filter(r => r.inventoryCount <= r.lowStockAlert).length;
+  const todayReminders = reminders.filter(r => {
+    const today = new Date().toISOString().split('T')[0];
+    const startDate = new Date(r.startDate).toISOString().split('T')[0];
+    const endDate = new Date(r.endDate).toISOString().split('T')[0];
+    return today >= startDate && today <= endDate;
+  }).length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -69,6 +92,17 @@ const Dashboard: React.FC = () => {
           Add New Reminder
         </Link>
       </div>
+
+      {/* Simple Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatsCard title="Total Medicines" value={totalReminders} icon="💊" color="bg-blue-100" />
+        <StatsCard title="Active Today" value={todayReminders} icon="⏰" color="bg-green-100" />
+        <StatsCard title="Low Stock" value={lowStockCount} icon="⚠️" color="bg-red-100" />
+        <StatsCard title="Active Reminders" value={activeReminders} icon="✅" color="bg-purple-100" />
+      </div>
+
+      {/* Quick Actions */}
+      <QuickActions />
 
       <div className="mb-6 flex flex-wrap gap-4">
         <input
@@ -122,6 +156,12 @@ const Dashboard: React.FC = () => {
                     )}
                   </div>
                   <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleMarkAsTaken(reminder._id, reminder.medicineName)}
+                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                    >
+                      ✅ Taken
+                    </button>
                     <button
                       onClick={() => handleDelete(reminder._id)}
                       className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"

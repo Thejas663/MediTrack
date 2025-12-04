@@ -26,4 +26,9 @@ export const reminderAPI = {
   deleteReminder: (id: string) => api.delete(`/reminders/${id}`),
 };
 
+export const takenLogAPI = {
+  markAsTaken: (data: any) => api.post('/taken-logs', data),
+  getHistory: (reminderId: string) => api.get(`/taken-logs/${reminderId}`),
+};
+
 export default api;

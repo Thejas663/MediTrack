@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const reminderRoutes = require('./routes/reminders');
+const takenLogRoutes = require('./routes/takenLogs');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/taken-logs', takenLogRoutes);
 
 // Health check
 app.get('/', (req, res) => {
