@@ -6,10 +6,17 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+const getToken = () =>{
+  if(!localStorage.getItem('token')){
+    return false;
+  }
+  return true;
+}
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  return getToken() ? <>{children}</> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

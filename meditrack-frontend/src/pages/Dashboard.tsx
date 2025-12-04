@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchReminders();
-  }, [search, sortBy, currentPage, fetchReminders]);
+  }, [search, sortBy, currentPage]);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this reminder?')) {
