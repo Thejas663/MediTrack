@@ -14,8 +14,6 @@ const getToken = () =>{
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  
   return getToken() ? <>{children}</> : <Navigate to="/login" />;
 };
 

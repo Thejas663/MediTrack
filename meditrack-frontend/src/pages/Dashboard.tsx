@@ -7,6 +7,7 @@ import QuickActions from '../components/QuickActions';
 interface Reminder {
   _id: string;
   medicineName: string;
+  category: string;
   dosage: string;
   frequency: string;
   startDate: string;
@@ -14,6 +15,8 @@ interface Reminder {
   times: string[];
   notes?: string;
   isActive: boolean;
+  inventoryCount: number;
+  lowStockAlert: number;
 }
 
 const Dashboard: React.FC = () => {
@@ -43,7 +46,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchReminders();
-  }, [search, sortBy, currentPage]);
+  }, [search, sortBy, currentPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this reminder?')) {
@@ -140,9 +143,23 @@ const Dashboard: React.FC = () => {
               <div key={reminder._id} className="bg-white p-6 rounded-lg shadow-md border">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-blue-600 mb-2">
-                      {reminder.medicineName}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">
+                        {reminder.category === 'tablet' && '💊'}
+                        {reminder.category === 'liquid' && '🥤'}
+                        {reminder.category === 'injection' && '💉'}
+                        {reminder.category === 'inhaler' && '🫁'}
+                        {reminder.category === 'drops' && '💧'}
+                      </span>
+                      <h3 className="text-xl font-semibold text-blue-600">
+                        {reminder.medicineName}
+                      </h3>
+                      {reminder.inventoryCount <= reminder.lowStockAlert && (
+                        <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                          Low Stock!
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-600 mb-1">Dosage: {reminder.dosage}</p>
                     <p className="text-gray-600 mb-1">Frequency: {reminder.frequency}</p>
                     <p className="text-gray-600 mb-1">
@@ -150,6 +167,12 @@ const Dashboard: React.FC = () => {
                     </p>
                     <p className="text-gray-600 mb-1">
                       Duration: {new Date(reminder.startDate).toLocaleDateString()} - {new Date(reminder.endDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-gray-600 mb-1">
+                      Stock: {reminder.inventoryCount} remaining
+                      {reminder.inventoryCount <= reminder.lowStockAlert && (
+                        <span className="text-red-600 font-semibold"> (Refill needed!)</span>
+                      )}
                     </p>
                     {reminder.notes && (
                       <p className="text-gray-600 mt-2">Notes: {reminder.notes}</p>
